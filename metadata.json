@@ -1,0 +1,6 @@
+{
+  "name": "Now Playing",
+  "description": "A customizable Windows 11 desktop music display widget prototype featuring album artwork and a spinning vinyl record.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
