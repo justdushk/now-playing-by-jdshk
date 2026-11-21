@@ -66,4 +66,17 @@ export const MOCK_TRACKS: Track[] = [
     labelAccentHex: '#B6854B',
     releaseYear: 2025,
   },
+  {
+    id: 'track-white-canvas',
+    title: 'White Canvas',
+    artist: 'Test Artist',
+    album: 'White Canvas',
+    artworkUrl: '/src/assets/images/white_canvas.svg',
+    durationSeconds: 180,
+    positionSeconds: 0,
+    playbackState: 'playing',
+    source: 'test',
+    labelAccentHex: '#D4D7DD',
+    releaseYear: 2026,
+  },
 ];
