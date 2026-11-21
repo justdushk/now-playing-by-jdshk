@@ -33,7 +33,19 @@ export function VinylDisc({
 
   const isLightWax = vinylColor === 'bone-ivory';
   const labelSize = Math.round(sizePx * 0.35);
-  const spindleSize = Math.max(8, Math.round(sizePx * 0.058));
+  const spindleSize = Math.max(10, Math.round(sizePx * 0.068));
+  const holeRadiusPx = spindleSize / 2;
+  const holeMask = `radial-gradient(circle at 50% 50%, transparent 0px, transparent ${holeRadiusPx}px, black ${holeRadiusPx + 0.75}px)`;
+  const maskStyles = {
+    maskImage: holeMask,
+    WebkitMaskImage: holeMask,
+    maskRepeat: 'no-repeat',
+    WebkitMaskRepeat: 'no-repeat',
+    maskPosition: 'center',
+    WebkitMaskPosition: 'center',
+    maskSize: '100% 100%',
+    WebkitMaskSize: '100% 100%',
+  } as const;
   const spinDurationSeconds = 6 / Math.max(0.25, rotationSpeed);
 
   return (
@@ -42,12 +54,12 @@ export function VinylDisc({
       style={{
         width: `${sizePx}px`,
         height: `${sizePx}px`,
-        boxShadow:
-          '0 18px 36px -8px rgba(0, 0, 0, 0.72), 0 4px 12px rgba(0, 0, 0, 0.5)',
+        filter:
+          'drop-shadow(0 18px 28px rgba(0, 0, 0, 0.72)) drop-shadow(0 4px 10px rgba(0, 0, 0, 0.45))',
       }}
       aria-hidden="true"
     >
-      {/* Pure CSS rotating vinyl disc body + grooves + central artwork label */}
+      {/* Pure CSS rotating vinyl disc body + grooves + central artwork label + center cutout */}
       <div
         className="absolute inset-0 rounded-full will-change-transform"
         style={{
@@ -57,6 +69,7 @@ export function VinylDisc({
           animationIterationCount: 'infinite',
           animationPlayState: isPlaying ? 'running' : 'paused',
           transformOrigin: 'center center',
+          ...maskStyles,
           backgroundColor: palette.baseHex,
           boxShadow: `inset 0 0 0 1.5px ${palette.rimHex}`,
           backgroundImage: `
@@ -110,7 +123,7 @@ export function VinylDisc({
           }}
         />
 
-        {/* Central circular album artwork label (rotates with the vinyl disc) */}
+        {/* Central circular album artwork label (rotates with the vinyl disc, masked at center) */}
         <div
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 overflow-hidden bg-[#191B20]"
           style={{
@@ -120,6 +133,7 @@ export function VinylDisc({
             border: `1.5px solid ${labelAccentHex}`,
             boxShadow:
               'inset 0 0 6px rgba(0, 0, 0, 0.5), 0 0 0 2px rgba(0, 0, 0, 0.55)',
+            ...maskStyles,
           }}
         >
           {!labelImgFailed ? (
@@ -148,16 +162,21 @@ export function VinylDisc({
           />
         </div>
 
-        {/* Center vinyl spindle hole */}
+        {/* Thin bevel rim strictly around the transparent center cutout (rotates with disc) */}
         <div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
           style={{
-            width: `${spindleSize}px`,
-            height: `${spindleSize}px`,
+            width: `${spindleSize + 3}px`,
+            height: `${spindleSize + 3}px`,
             borderRadius: '50%',
-            backgroundColor: '#0B0C10',
-            boxShadow:
-              'inset 0 1px 2px rgba(0, 0, 0, 0.95), 0 0 0 1.5px rgba(255, 255, 255, 0.22), 0 0 4px rgba(0, 0, 0, 0.7)',
+            backgroundColor: 'transparent',
+            borderWidth: '1.5px',
+            borderStyle: 'solid',
+            borderTopColor: 'rgba(255, 255, 255, 0.30)',
+            borderRightColor: 'rgba(255, 255, 255, 0.16)',
+            borderBottomColor: 'rgba(0, 0, 0, 0.55)',
+            borderLeftColor: 'rgba(255, 255, 255, 0.16)',
+            boxShadow: '0 0 0 1px rgba(0, 0, 0, 0.55)',
           }}
         />
       </div>

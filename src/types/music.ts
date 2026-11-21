@@ -2,7 +2,8 @@ export type MusicSourceId =
   | 'spotify'
   | 'youtube-music'
   | 'soundcloud'
-  | 'windows-smtc';
+  | 'windows-smtc'
+  | 'test';
 
 export type PlaybackState = 'playing' | 'paused' | 'stopped';
 
@@ -113,6 +114,7 @@ export const SOURCE_LABELS: Record<MusicSourceId, string> = {
   'youtube-music': 'YouTube Music',
   soundcloud: 'SoundCloud',
   'windows-smtc': 'Windows SMTC',
+  test: 'Test',
 };
 
 export const DEFAULT_WIDGET_SETTINGS: WidgetSettings = {

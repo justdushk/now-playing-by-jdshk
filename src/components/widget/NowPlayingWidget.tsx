@@ -19,27 +19,67 @@ interface NowPlayingWidgetProps {
   onSeek: (positionSeconds: number) => void;
 }
 
-const SIZE_DIMENSIONS: Record<
-  WidgetSizePreset,
-  { coverPx: number; vinylPx: number; vinylProtrudePx: number; cardPaddingPx: number }
-> = {
+interface HorizontalSizeMetrics {
+  coverPx: number;
+  vinylPx: number;
+  vinylProtrudePx: number;
+  columnGapPx: number;
+  infoWidthPx: number;
+  cardPaddingPx: number;
+  titleClass: string;
+  subtitleClass: string;
+  timeClass: string;
+  playButtonClass: string;
+  playIconClass: string;
+  skipButtonClass: string;
+  skipIconClass: string;
+}
+
+const SIZE_DIMENSIONS: Record<WidgetSizePreset, HorizontalSizeMetrics> = {
   compact: {
-    coverPx: 156,
-    vinylPx: 146,
-    vinylProtrudePx: 68,
-    cardPaddingPx: 20,
+    coverPx: 116,
+    vinylPx: 108,
+    vinylProtrudePx: 62,
+    columnGapPx: 16,
+    infoWidthPx: 204,
+    cardPaddingPx: 16,
+    titleClass: 'text-[13.5px] leading-tight',
+    subtitleClass: 'text-[11.5px] leading-tight',
+    timeClass: 'text-[10px]',
+    playButtonClass: 'w-7 h-7',
+    playIconClass: 'w-3 h-3',
+    skipButtonClass: 'p-1.5',
+    skipIconClass: 'w-3 h-3',
   },
   standard: {
-    coverPx: 188,
-    vinylPx: 176,
-    vinylProtrudePx: 82,
-    cardPaddingPx: 24,
+    coverPx: 140,
+    vinylPx: 130,
+    vinylProtrudePx: 75,
+    columnGapPx: 20,
+    infoWidthPx: 236,
+    cardPaddingPx: 20,
+    titleClass: 'text-[15px] leading-snug',
+    subtitleClass: 'text-[12.5px] leading-snug',
+    timeClass: 'text-[11px]',
+    playButtonClass: 'w-8 h-8',
+    playIconClass: 'w-3.5 h-3.5',
+    skipButtonClass: 'p-1.5',
+    skipIconClass: 'w-3.5 h-3.5',
   },
   large: {
-    coverPx: 216,
-    vinylPx: 202,
-    vinylProtrudePx: 94,
-    cardPaddingPx: 24,
+    coverPx: 164,
+    vinylPx: 152,
+    vinylProtrudePx: 88,
+    columnGapPx: 24,
+    infoWidthPx: 268,
+    cardPaddingPx: 22,
+    titleClass: 'text-[16.5px] leading-snug',
+    subtitleClass: 'text-[13.5px] leading-snug',
+    timeClass: 'text-[11.5px]',
+    playButtonClass: 'w-9 h-9',
+    playIconClass: 'w-4 h-4',
+    skipButtonClass: 'p-2',
+    skipIconClass: 'w-4 h-4',
   },
 };
 
@@ -60,7 +100,8 @@ export function NowPlayingWidget({
 
   const dims = SIZE_DIMENSIONS[settings.widgetSize];
   const stageWidthPx = dims.coverPx + dims.vinylProtrudePx;
-  const cardWidthPx = stageWidthPx + dims.cardPaddingPx * 2;
+  const cardWidthPx =
+    dims.cardPaddingPx * 2 + stageWidthPx + dims.columnGapPx + dims.infoWidthPx;
   const isPlaying = track.playbackState === 'playing';
   const isVinylLeft = settings.vinylPosition === 'left';
 
@@ -83,23 +124,24 @@ export function NowPlayingWidget({
     <aside
       aria-label="Now Playing desktop widget"
       aria-hidden={!isVisible}
-      className={`motion-safe-only transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+      className={`motion-safe-only transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] max-w-full ${
         isVisible
           ? 'opacity-100 translate-y-0 scale-100'
           : 'opacity-0 translate-y-3 scale-[0.97] pointer-events-none'
       }`}
     >
-      {/* Frosted dark Windows 11 widget surface */}
+      {/* Horizontal dark desktop widget surface */}
       <div
-        className="relative rounded-2xl bg-[#14161B]/92 backdrop-blur-xl border border-white/[0.08] shadow-[0_24px_60px_-12px_rgba(0,0,0,0.78)] select-none"
+        className="relative rounded-2xl bg-[#14161B]/92 backdrop-blur-xl border border-white/[0.08] shadow-[0_24px_60px_-12px_rgba(0,0,0,0.78)] select-none flex items-center max-w-full"
         style={{
           width: `${cardWidthPx}px`,
           padding: `${dims.cardPaddingPx}px`,
+          gap: `${dims.columnGapPx}px`,
         }}
       >
-        {/* Artwork + Overlapping Vinyl Stage */}
+        {/* LEFT SECTION: Square Album Cover + Protruding Spinning Vinyl Behind It */}
         <div
-          className="relative mx-auto"
+          className="relative shrink-0"
           style={{
             width: `${stageWidthPx}px`,
             height: `${dims.coverPx}px`,
@@ -145,9 +187,9 @@ export function NowPlayingWidget({
                 draggable={false}
               />
             ) : (
-              <div className="w-full h-full flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-[#232630] to-[#15171D] p-4 text-center">
-                <Disc3 className="w-9 h-9 text-white/40" />
-                <span className="text-xs text-white/60 font-medium line-clamp-2">
+              <div className="w-full h-full flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-[#232630] to-[#15171D] p-3 text-center">
+                <Disc3 className="w-8 h-8 text-white/40" />
+                <span className="text-[11px] text-white/60 font-medium line-clamp-2">
                   {track.album}
                 </span>
               </div>
@@ -158,98 +200,112 @@ export function NowPlayingWidget({
           </div>
         </div>
 
-        {/* Track Metadata */}
-        <div className="mt-4 space-y-1">
-          <h2
-            className="text-[15px] font-semibold tracking-[-0.01em] text-[#F3F4F6] truncate"
-            title={track.title}
-          >
-            {track.title}
-          </h2>
+        {/* RIGHT SECTION: Track Metadata, Progress & Playback Controls */}
+        <div
+          className={`flex-1 min-w-0 flex flex-col ${
+            settings.showInlineControls ? 'justify-between' : 'justify-center gap-3.5'
+          }`}
+          style={{
+            minHeight: `${dims.coverPx}px`,
+          }}
+        >
+          {/* Track Title + Artist & Source */}
+          <div className="space-y-1 min-w-0">
+            <h2
+              className={`font-semibold tracking-[-0.01em] text-[#F3F4F6] truncate ${dims.titleClass}`}
+              title={track.title}
+            >
+              {track.title}
+            </h2>
 
-          <div className="flex items-center gap-1.5 text-[13px] text-[#9CA3B0] min-w-0">
-            <span className="truncate">{track.artist}</span>
-            <span aria-hidden="true" className="text-[#565C68] shrink-0">
-              ·
-            </span>
-            <span className="text-[#78808E] whitespace-nowrap shrink-0">
-              {SOURCE_LABELS[track.source]}
-            </span>
+            <div
+              className={`flex items-center gap-1.5 text-[#9CA3B0] min-w-0 ${dims.subtitleClass}`}
+            >
+              <span className="truncate">{track.artist}</span>
+              <span aria-hidden="true" className="text-[#565C68] shrink-0">
+                ·
+              </span>
+              <span className="text-[#78808E] whitespace-nowrap shrink-0">
+                {SOURCE_LABELS[track.source]}
+              </span>
+            </div>
           </div>
-        </div>
 
-        {/* Interactive Progress Bar + Tabular Timestamps */}
-        <div className="mt-3.5 space-y-1.5">
-          <div
-            role="slider"
-            tabIndex={0}
-            aria-label="Track playback position"
-            aria-valuemin={0}
-            aria-valuemax={track.durationSeconds}
-            aria-valuenow={Math.round(track.positionSeconds)}
-            onClick={handleProgressClick}
-            onKeyDown={(e) => {
-              if (e.key === 'ArrowRight') {
-                onSeek(Math.min(track.durationSeconds, track.positionSeconds + 5));
-              } else if (e.key === 'ArrowLeft') {
-                onSeek(Math.max(0, track.positionSeconds - 5));
-              }
-            }}
-            className="group relative h-3 flex items-center cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E5A952]/70 rounded"
-          >
-            <div className="w-full h-[3px] rounded-full bg-white/[0.10] overflow-hidden">
+          {/* Interactive Progress Bar + Tabular Timestamps */}
+          <div className="space-y-1">
+            <div
+              role="slider"
+              tabIndex={0}
+              aria-label="Track playback position"
+              aria-valuemin={0}
+              aria-valuemax={track.durationSeconds}
+              aria-valuenow={Math.round(track.positionSeconds)}
+              onClick={handleProgressClick}
+              onKeyDown={(e) => {
+                if (e.key === 'ArrowRight') {
+                  onSeek(Math.min(track.durationSeconds, track.positionSeconds + 5));
+                } else if (e.key === 'ArrowLeft') {
+                  onSeek(Math.max(0, track.positionSeconds - 5));
+                }
+              }}
+              className="group relative h-3 flex items-center cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E5A952]/70 rounded"
+            >
+              <div className="w-full h-[3px] rounded-full bg-white/[0.10] overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-[#ECEEF2] transition-[width] duration-200 ease-linear"
+                  style={{ width: `${progressPct}%` }}
+                />
+              </div>
               <div
-                className="h-full rounded-full bg-[#ECEEF2] transition-[width] duration-200 ease-linear"
-                style={{ width: `${progressPct}%` }}
+                className="absolute w-2.5 h-2.5 rounded-full bg-white shadow-sm opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity duration-150 -translate-x-1/2 pointer-events-none"
+                style={{ left: `${progressPct}%` }}
               />
             </div>
+
             <div
-              className="absolute w-2.5 h-2.5 rounded-full bg-white shadow-sm opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity duration-150 -translate-x-1/2 pointer-events-none"
-              style={{ left: `${progressPct}%` }}
-            />
+              className={`flex items-center justify-between font-mono tabular-nums text-[#7C8391] ${dims.timeClass}`}
+            >
+              <span>{formatDuration(track.positionSeconds)}</span>
+              <span>{formatDuration(track.durationSeconds)}</span>
+            </div>
           </div>
 
-          <div className="flex items-center justify-between text-[11px] font-mono tabular-nums text-[#7C8391]">
-            <span>{formatDuration(track.positionSeconds)}</span>
-            <span>{formatDuration(track.durationSeconds)}</span>
-          </div>
+          {/* Optional Clean Inline Transport Controls */}
+          {settings.showInlineControls && (
+            <div className="pt-1 border-t border-white/[0.06] flex items-center justify-center gap-3">
+              <button
+                type="button"
+                onClick={onPrevTrack}
+                aria-label="Previous track"
+                className={`rounded-lg text-[#9CA3B0] hover:text-white hover:bg-white/[0.06] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E5A952]/70 ${dims.skipButtonClass}`}
+              >
+                <SkipBack className={dims.skipIconClass} />
+              </button>
+
+              <button
+                type="button"
+                onClick={onTogglePlayPause}
+                aria-label={isPlaying ? 'Pause playback' : 'Play playback'}
+                className={`rounded-full bg-[#ECEEF2] text-[#111318] hover:bg-white flex items-center justify-center transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E5A952] ${dims.playButtonClass}`}
+              >
+                {isPlaying ? (
+                  <Pause className={`${dims.playIconClass} fill-current`} />
+                ) : (
+                  <Play className={`${dims.playIconClass} fill-current translate-x-[0.5px]`} />
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={onNextTrack}
+                aria-label="Next track"
+                className={`rounded-lg text-[#9CA3B0] hover:text-white hover:bg-white/[0.06] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E5A952]/70 ${dims.skipButtonClass}`}
+              >
+                <SkipForward className={dims.skipIconClass} />
+              </button>
+            </div>
+          )}
         </div>
-
-        {/* Optional Clean Inline Transport Controls */}
-        {settings.showInlineControls && (
-          <div className="mt-2.5 pt-2.5 border-t border-white/[0.06] flex items-center justify-center gap-4">
-            <button
-              type="button"
-              onClick={onPrevTrack}
-              aria-label="Previous track"
-              className="p-2 rounded-lg text-[#9CA3B0] hover:text-white hover:bg-white/[0.06] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E5A952]/70"
-            >
-              <SkipBack className="w-3.5 h-3.5" />
-            </button>
-
-            <button
-              type="button"
-              onClick={onTogglePlayPause}
-              aria-label={isPlaying ? 'Pause playback' : 'Play playback'}
-              className="w-8 h-8 rounded-full bg-[#ECEEF2] text-[#111318] hover:bg-white flex items-center justify-center transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E5A952]"
-            >
-              {isPlaying ? (
-                <Pause className="w-3.5 h-3.5 fill-current" />
-              ) : (
-                <Play className="w-3.5 h-3.5 fill-current translate-x-[0.5px]" />
-              )}
-            </button>
-
-            <button
-              type="button"
-              onClick={onNextTrack}
-              aria-label="Next track"
-              className="p-2 rounded-lg text-[#9CA3B0] hover:text-white hover:bg-white/[0.06] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E5A952]/70"
-            >
-              <SkipForward className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        )}
       </div>
     </aside>
   );
